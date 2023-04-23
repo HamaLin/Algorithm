@@ -6,12 +6,13 @@ WITH RECURSIVE cte AS (
 )
 
 SELECT 
-        HOUR,
-        (
-            SELECT COUNT(*)
+        CTE.HOUR,
+        IF(SUB_QUERY.COUNT IS NULL, 0, SUB_QUERY.COUNT) AS 'COUNT'
+    FROM (
+            SELECT COUNT(*) AS 'COUNT', HOUR(DATETIME) AS 'HOUR'
             FROM ANIMAL_OUTS 
-            GROUP BY HOUR(ANIMAL_OUTS.DATETIME)
-            HAVING HOUR(ANIMAL_OUTS.DATETIME) = HOUR
-        ) AS 'COUNT'
-    FROM cte
+            GROUP BY HOUR(DATETIME)
+        ) AS SUB_QUERY
+    RIGHT OUTER JOIN cte AS CTE
+    ON CTE.HOUR = SUB_QUERY.HOUR
     ;
