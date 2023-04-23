@@ -7,16 +7,11 @@ WITH RECURSIVE cte AS (
 
 SELECT 
         HOUR,
-        IF((
+        (
             SELECT COUNT(*)
             FROM ANIMAL_OUTS 
-            WHERE HOUR(DATETIME) = HOUR
-            GROUP BY HOUR(DATETIME)
-        )> 0, (
-            SELECT COUNT(*)
-            FROM ANIMAL_OUTS 
-            WHERE HOUR(DATETIME) = HOUR
-            GROUP BY HOUR(DATETIME)
-        ), 0) AS 'COUNT'
+            GROUP BY HOUR(ANIMAL_OUTS.DATETIME)
+            HAVING HOUR(ANIMAL_OUTS.DATETIME) = HOUR
+        ) AS 'COUNT'
     FROM cte
     ;
