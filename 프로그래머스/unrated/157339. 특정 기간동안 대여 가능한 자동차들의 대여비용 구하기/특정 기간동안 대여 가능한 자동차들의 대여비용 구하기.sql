@@ -1,0 +1,22 @@
+-- 코드를 입력하세요
+SELECT 
+        CAR.CAR_ID, 
+        CAR.CAR_TYPE,
+        TRUNCATE(((CAR.DAILY_FEE* 30) * (100 - dis.DISCOUNT_RATE) / 100), -1)
+        AS FEE
+    FROM CAR_RENTAL_COMPANY_CAR AS CAR
+    JOIN CAR_RENTAL_COMPANY_DISCOUNT_PLAN AS DIS
+    ON DIS.CAR_TYPE = CAR.CAR_TYPE
+    WHERE 
+        CAR.CAR_TYPE IN('세단', 'SUV')
+            AND
+            CAR.CAR_ID NOT IN 
+                (SELECT CAR_ID 
+                    FROM CAR_RENTAL_COMPANY_RENTAL_HISTORY 
+                    WHERE DATE_FORMAT(END_DATE, '%Y-%m-%d') > '2022-11'
+                )
+            AND
+        DIS.DURATION_TYPE LIKE ('30%')
+    GROUP BY CAR.CAR_ID
+    HAVING FEE >= 500000 AND FEE < 2000000
+    ORDER BY FEE DESC, CAR.CAR_TYPE ASC, CAR.CAR_ID DESC
