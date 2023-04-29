@@ -5,19 +5,19 @@ let input = require("fs")
   .split("\n");
 
 function getRemainderCount(arr) {
-  const [n, m] = arr[0].split(" ").map(Number);
+  const [n, m] = arr[0].split(" ");
   const newArr = arr.splice(1);
-  const buckets = Array.from({ length: n }, (_, i) => i + 1);
+  const buckets = Array.from({ length: +n }, (_, i) => i + 1);
 
   for (let i = 0; i < newArr.length; i++) {
-    const [start, end] = newArr[i].split(" ").map(Number);
+    const [start, end] = newArr[i].split(" ");
     const revertArr = [];
 
-    for (let j = end; j >= start; j--) {
+    for (let j = +end; j >= +start; j--) {
       revertArr.push(buckets[j - 1]);
     }
 
-    buckets.splice(start - 1, end - start + 1, ...revertArr);
+    buckets.splice(+start - 1, +end - +start + 1, ...revertArr);
   }
 
   return buckets.join(" ");
