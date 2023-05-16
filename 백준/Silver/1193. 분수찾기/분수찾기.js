@@ -1,35 +1,63 @@
 const input = require("fs").readFileSync("/dev/stdin").toString().trim();
-let obj = {
-  min: 0,
-  max: 0,
-  idx: 0,
-};
-let result = {
-  fraction: 1,
-  denominator: 1,
-};
-let flag = true;
+let n1 = +input;
+let i = 1;
 
-for (let i = 0; i < 1e10; i++) {
-  obj.min = obj.max + 1;
-  obj.max = i + obj.max + 1;
-  obj.idx = i + 1;
-  if (+input >= obj.min && +input <= obj.max) break;
+while (n1 > i) {
+  n1 -= i++;
 }
 
-if (obj.idx % 2 === 0) result.denominator = obj.idx;
-else {
-  flag = false;
-  result.fraction = obj.idx;
-}
+if (i % 2 === 0) console.log(`${n1}/${i - n1 + 1}`);
+else console.log(`${1 + i - n1}/ ${n1}`);
 
-for (let i = 0; i < obj.max - obj.min; i++) {
-  if (obj.min + i === +input) break;
+/*
+n1: 찾고자 하는 숫자
+i: 찾는 숫자의 계층
 
-  result.denominator = flag ? result.denominator - 1 : result.denominator + 1;
-  result.fraction = flag ? result.fraction + 1 : result.fraction - 1;
+여기서 찾고자 하는 숫자의 계층이라는 뜻은
 
-  if (result.denominator === result.fraction) flag = false;
-}
+1/1               1
+1/2 2/1           2
+3/1 2/2 1/3       3
+1/4 2/3 3/2 4/1   4
+.                 .
+.                 .
+.                 .
 
-console.log(result.fraction + "/" + result.denominator);
+위 형식과 같이 지그제그로 이동할 때, 다음과 같은 패턴이 나온다.
+  1. 계층은 1칸씩 증가할때마다, 길이가 1개씩 증가한다. 이는 계층의 위치와 동일하다
+  2. 계층이 짝수일때는 계층의 위치값이 분모에 들어가 있고 분자는 1이다. 홀수는 반대로 적용된다.
+  3. 계층에서 값들의 분자와 분모는 각각 반대로 1을 더하거나 뺀다.
+
+다음과 같은 정보에서 우리가 알아야 하는 정보는 원하는 숫자의 계층이 어디인지를 알면 원하는 분수를 찾을수 있다.
+
+먼저 while문을 통해서 숫자의 계층이 어디인지 알아야 한다. (n1 > i)
+처음에 여기서 n1 -= i++가 이해가 가지 않았는데. 이는 해석하면 간단하다.
+위 숫자의 계층의 패턴을 알아보면 계층이 증가할 때마다, 계층값의 갯수가 1개씩 증가한다.
+즉 우리가 찾고자 하는 n1의 위치 계층 전까지의 숫자를 전부 없애버리는 과정이다.
+
+예를들면 5라는 숫자를 찾으려면 다음과 같다
+n1: 5
+i: 1
+-> 1계층의 값의 갯수를 전체 값에서 뺀다
+
+n1: 4
+i: 2
+-> 2계층의 값의 갯수를 전체 값에서 뺀다
+
+n1: 2
+i: 3
+-> 3계층의 값의 갯수를 전체 값에서 뺀다
+
+참고로 다음과 같은 공식도 있다. 
+k(k+1)/2
+여기서 k는 계층의 위치.
+다음과 같은 공식을 사용하면 해당 위치 계층의 총 갯수를 한번에 구할 수 있다. (이 방법이 더 빠를지도...?)
+
+이를 통해서 우리는 계층의 위치를 알아냈다(i)
+계층의 위치를 알아내면 다음은 계층값의 갯수중 어디에 위치하는냐이다.
+사실상 이건 간단하다. 왜나면 우리가 앞써 while을 통해서 필요없는 지난 값들을 지웠기 때문에, n1이 바로 우리가 찾고자 하는 값의 순서이다.
+위의 예시를 다시 가져오자면 n1:2 라는 의미가 3계층의 2번째에 위치한다는 얘기이다.
+그래서 i - n1 + 1가 나오게 된다. (+1을 안해주면 0이 나오기 때문에 안된다.)
+
+그리고 마지막으로 위에 적었던 패턴 1,2에 따라서 계층(i)가 홀수인지 짝수인지에 따라서 분기문을 나눈것이다.
+*/
